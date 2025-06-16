@@ -1,11 +1,32 @@
-# Replace this with the path you get from `brew info sfml`
-SFML_PATH = /usr/local/Cellar/sfml/3.0.1
+# Directorios de origen y destino
+SRC_DIR := src
+BIN_DIR := bin
+INCLUDE_DIR := include
 
-# Replace "src" with the name of the folder where all your cpp code is
-cppFileNames := $(shell find ./src -type f -name "*.cpp")
+# Archivos fuente y ejecutable
+CPP_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+EXECUTABLE := $(BIN_DIR)/main
 
-all: compile
+# Librerías SFML
+SFML := -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 
-compile:	
-	mkdir -p bin
-	g++ $(cppFileNames) -std=c++17 -I$(SFML_PATH)/include -o main -L$(SFML_PATH)/lib -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsfml-network
+# Regla para compilar el ejecutable principal
+$(EXECUTABLE): $(CPP_FILES)
+	g++ $(CPP_FILES) -o $(EXECUTABLE) $(SFML) -I$(INCLUDE_DIR) -std=c++17
+
+# Regla por defecto para compilar el proyecto
+all: $(EXECUTABLE)
+
+# Regla para ejecutar el programa
+run: $(EXECUTABLE)
+	./$(EXECUTABLE)
+
+# Regla para compilar y ejecutar el programa
+main: all
+	./$(EXECUTABLE)
+
+# Regla para limpiar los archivos generados
+clean:
+	rm -f $(EXECUTABLE)
+
+.PHONY: all clean run

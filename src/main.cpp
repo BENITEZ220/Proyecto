@@ -1,10 +1,13 @@
 #include <SFML/Graphics.hpp>
+#include <ground.h>
+#include "obstacle.h"
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode({200, 200}), "SFML works!");
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
+    sf::RenderWindow window(sf::VideoMode({800, 500}), "VIDEOJUEGO");
+
+    Ground ground;
+    Obstacle obstacle;
 
     while (window.isOpen())
     {
@@ -14,8 +17,9 @@ int main()
                 window.close();
         }
 
-        window.clear();
-        window.draw(shape);
+        window.clear(sf::Color::White);
+        ground.draw(window);
+        obstacle.draw(window);
         window.display();
     }
 }
