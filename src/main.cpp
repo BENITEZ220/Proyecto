@@ -3,31 +3,37 @@
 int main()
 {
     // create the window
-    sf::RenderWindow window(sf::VideoMode({800, 400}), "Video Juego");
+    sf::RenderWindow window(sf::VideoMode({800, 400}), "VideoJuego");
     window.setFramerateLimit(30); // Set the frame rate limit to 60 FPS
 
-    sf::Texture plant("assets/obstacle.png");
+    sf::Texture plant("assets/image/obstacle.png");
     sf::Sprite obstacle(plant);
     obstacle.scale({0.10f, 0.10f});
     obstacle.setPosition({650.f, 220.f});
 
-    sf::Texture floor("assets/ground.png");
+    sf::Texture floor("assets/image/ground.png");
     sf::Sprite ground(floor);
     ground.scale({0.30f, 0.30f});
     ground.setOrigin({0.f, 0.f});
     ground.setPosition({0.f, 80.f});
 
-    sf::Texture yoshi("assets/dinosaur/dino 1.png");
+    sf::Texture yoshi("assets/image/dinosaur/dino 1.png");
     sf::Sprite dinosaur(yoshi);
     dinosaur.scale({0.20f, 0.20f});
     dinosaur.setOrigin({0.f, 0.f});
     dinosaur.setPosition({20.f, 223.f});
 
-    sf::Texture cloud("assets/cloud.png");
+    sf::Texture cloud("assets/image/cloud.png");
     sf::Sprite sky(cloud);
     sky.scale({0.30f, 0.30f});
     sky.setOrigin({0.f, 0.f});
     sky.setPosition({20.f, 20.f});
+
+    sf::Texture ghost("assets/image/ghost.png");
+    sf::Sprite enemy(ghost);
+    enemy.scale({0.10f, 0.10f});
+    enemy.setOrigin({0.f, 0.f});
+    enemy.setPosition({200.f, 150.f});
 
     // run the program as long as the window is open
     while (window.isOpen())
@@ -46,6 +52,7 @@ int main()
         // draw everything here...
         // window.draw(...);
         // inside the main loop, between window.clear() and window.display()
+        window.draw(enemy);
         window.draw(sky);
         window.draw(dinosaur);
         window.draw(obstacle);
