@@ -3,6 +3,8 @@
         {
             "name": "Mac",
             "includePath": [
+                "${workspaceFolder}/src",
+                "${workspaceFolder}/include",
                 "${workspaceFolder}/**",
                 "/usr/local/include",
                 "/usr/local/include/SFML"
