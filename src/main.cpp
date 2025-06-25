@@ -1,70 +1,59 @@
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
-#include "ground.hpp"
-#include "dino.hpp"
-#include "obstacle.hpp"
-#include "cloud.hpp"
-#include "ghost.hpp"
-
+#include <vector>
+#include <string>
+ 
 int main()
 {
-    bool initiated;
-    bool presset;
-    
-    // create the window
-    sf::RenderWindow window(sf::VideoMode({800, 400}), "VideoJuego");
-    window.setFramerateLimit(30); // Set the frame rate limit to 60 FPS
-    presset=false;
+    // Animation variables
+    size_t currentFrame = 0;
+    sf::Clock animationClock;
+    const sf::Time frameDuration = sf::milliseconds(100); // 100 ms per frame
 
-    //Dino dino(20, 20);
-    Cloud cloud;
-    Ghost ghost;
-    Ground ground;
-    Obstacle obstacle;
+    // Create the main window
+    sf::RenderWindow window(sf::VideoMode({800, 600}), "Videojuego");
 
-    // run the program as long as the window is open
+    // Load textures for animation frames
+    std::vector<sf::Texture> yoshiFrames(9);
+    for (int i = 0; i < 6; ++i)
+    {
+        if (!yoshiFrames[i].loadFromFile("assets/image/dinosaur/dino " + std::to_string(i + 1) + ".png"))
+        {
+            return -1; // Exit if any texture fails to load
+        }
+    }
+
+    // Create sprite and set initial texture
+    sf::Sprite dinosaur(yoshiFrames[0]);
+
+
+
+    // Start the game loop
     while (window.isOpen())
     {
-        Dino *dino =new Dino(20, 20);
-        initiated=false;
-        // check all the window's events that were triggered since the last iteration of the loop
-        while (const std::optional event = window.pollEvent())
+        // Process events
+        while (const std::optional<sf::Event> event = window.pollEvent())
         {
-            // "close requested" event: we close the window
+            // Close window: exit
             if (event->is<sf::Event::Closed>())
                 window.close();
         }
-        dino->update();
 
-        if(dino->getLive()) {
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)&&!presset) {
-                presset=true;
-                dino->jump();
-                if(!initiated) {
-                    initiated=true;
-                    dino->initiate();
-                }
-            }
-        } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)&&!presset) {
-                presset=true;
-                break;
-            }
-        if(!sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
-            presset=false;
+        // Update animation
+        if (animationClock.getElapsedTime() >= frameDuration)
+        {
+            currentFrame = (currentFrame + 1) % 5; // Cycle through frames
+            dinosaur.setTexture(yoshiFrames[currentFrame]);
+            animationClock.restart();
         }
-        // clear the window with black color
-        window.clear(sf::Color(135, 206, 235));
 
-        // draw everything here...
-        // inside the main loop, between window.clear() and window.display()
-        dino->draw(window, sf::RenderStates::Default);
-        ghost.draw(window);
-        cloud.draw(window);
-        obstacle.draw(window);
-        ground.draw(window);
+        // Clear screen
+        window.clear();
 
-        // end the current frame
+        // Draw the sprite
+        window.draw(dinosaur);
+
+        // Update the window
         window.display();
-        delete dino;
-    } 
-    return 0;
+    }
 }
