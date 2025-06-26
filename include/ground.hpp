@@ -4,10 +4,8 @@
 
 class Ground {
 private:
-    sf::Texture floor;
-    sf::Sprite ground;
+
 public:
-    Ground();
-    void draw(sf::RenderWindow& window);
+
 };
 #endif // GROUND_HPP
