@@ -1,18 +1,40 @@
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <optional>
 #include <vector>
+#include <string>
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode({800, 400}), "VideoJuego");
+    // Animation variables
+    size_t currentFrame = 0;
+    sf::Clock animationClock;
+    const sf::Time frameDuration = sf::milliseconds(100); // 100 ms per frame
+
+    // Create the main window
+    sf::RenderWindow window(sf::VideoMode({800, 400}), "Videojuego");
     window.setFramerateLimit(60);
+
+    // Load textures for animation frames
+    std::vector<sf::Texture> yoshiFrames(9);
+    for (int i = 0; i < 6; ++i)
+    {
+        if (!yoshiFrames[i].loadFromFile("assets/image/dinosaur/dino " + std::to_string(i + 1) + ".png"))
+        {
+            return -1; // Exit if any texture fails to load
+        }
+    }
+
+    // Create sprite and set initial texture
+    sf::Sprite dinosaur(yoshiFrames[0]);
+    dinosaur.scale({0.25f, 0.25f}); // Cambia el tamaño del dinosaurio
+    dinosaur.setPosition({20.f, 200.f}); // Cambia la posición del dinosaurio
 
     // Obstáculo
     sf::Texture plant("assets/image/obstacle.png");
     sf::Sprite obstacle(plant);
     obstacle.scale({0.10f, 0.10f});
     obstacle.setPosition({650.f, 220.f});
-
     float obstacleSpeed = 2.5f;
 
     // Suelo
@@ -42,12 +64,12 @@ int main()
     sf::Texture ghostTexture("assets/image/ghost.png");
     sf::Sprite enemy(ghostTexture);
     enemy.scale({0.10f, 0.10f});
-    enemy.setPosition({200.f, 150.f});
+    enemy.setPosition({-1200.f, 150.f});
 
     float ghostSpeed = 4.5f;
 
     std::vector<sf::Sprite> obstacles;
-    for (int i = 0; i < 2; ++i) { // Reduce el número de obstáculos a 3
+    for (int i = 0; i < 3; ++i) { // Reduce el número de obstáculos a 3
         sf::Sprite obstacle(plant);
         obstacle.scale({0.10f, 0.10f});
         float randomDistance = 300.f + static_cast<float>(rand() % 200); // Distancia aleatoria entre 300 y 500
@@ -58,10 +80,20 @@ int main()
     // Loop del juego
     while (window.isOpen())
     {
-        while (std::optional<sf::Event> event = window.pollEvent())
+        // Process events
+        while (const std::optional<sf::Event> event = window.pollEvent())
         {
-            if (event && event->is<sf::Event::Closed>())
+            // Close window: exit
+            if (event->is<sf::Event::Closed>())
                 window.close();
+        }
+
+        // Update animation
+        if (animationClock.getElapsedTime() >= frameDuration)
+        {
+            currentFrame = (currentFrame + 1) % 5; // Cycle through frames
+            dinosaur.setTexture(yoshiFrames[currentFrame]);
+            animationClock.restart();
         }
 
         // Suelo
@@ -85,13 +117,15 @@ int main()
 
         // Enemy
         enemy.move({-ghostSpeed, 0.f});
-        if (enemy.getPosition().x < -100)
+        if (enemy.getPosition().x < -2000)
         {
             enemy.setPosition({800.f, 150.f});
         }
 
-        // Dibujar
+        // Clear screen
         window.clear(sf::Color(135, 206, 235));
+
+        // Draw the sprite
         window.draw(sky);
         window.draw(enemy);
         window.draw(ground1);
@@ -99,6 +133,9 @@ int main()
         for (const auto& obstacle : obstacles) {
             window.draw(obstacle);
         }
+        window.draw(dinosaur);
+
+        // Update the window
         window.display();
     }
 
