@@ -88,6 +88,9 @@ int main()
     float gravity = 0.3f; // Increased gravity for faster fall
     float originalY = dinosaur.getPosition().y;
 
+    bool gameStarted = false;
+    bool gamePaused = false;
+
     // Loop del juego
     while (window.isOpen())
     {
@@ -99,54 +102,83 @@ int main()
                 window.close();
         }
 
-        // Update animation
-        if (animationClock.getElapsedTime() >= frameDuration)
-        {
-            currentFrame = (currentFrame + 1) % 5; // Cycle through frames
-            dinosaur.setTexture(yoshiFrames[currentFrame]);
-            animationClock.restart();
-        }
-
-        // Suelo
-        ground1.move({-groundSpeed, 0.f});
-        ground2.move({-groundSpeed, 0.f});
-
-        if (ground1.getPosition().x + groundWidth < 0)
-            ground1.setPosition({ground2.getPosition().x + groundWidth, ground1.getPosition().y});
-
-        if (ground2.getPosition().x + groundWidth < 0)
-            ground2.setPosition({ground1.getPosition().x + groundWidth, ground2.getPosition().y});
-
-        // Obstáculos
-        for (auto& obstacle : obstacles) {
-            obstacle.move({-obstacleSpeed, 0.f});
-            if (obstacle.getPosition().x < -100) {
-                float randomDistance = 300.f + static_cast<float>(rand() % 200); // Distancia aleatoria entre 300 y 500
-                obstacle.setPosition({800.f + randomDistance, 240.f}); // Move obstacles 5 pixels lower
+        // Game start and resume logic
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
+            if (!gameStarted) {
+                gameStarted = true;
+            } else if (gamePaused) {
+                gamePaused = false;
+                dinosaur.setTexture(yoshiFrames[0]); // Reset to initial texture
+                dinosaur.setPosition({20.f, 200.f}); // Reset dinosaur position
+                for (auto& obstacle : obstacles) {
+                    float randomDistance = 300.f + static_cast<float>(rand() % 200); // Reset obstacle positions
+                    obstacle.setPosition({800.f + randomDistance, 240.f});
+                }
+                enemy.setPosition({-1200.f, 150.f}); // Reset enemy position
             }
         }
 
-        // Enemy
-        enemy.move({-ghostSpeed, 0.f});
-        if (enemy.getPosition().x < -2000)
-        {
-            enemy.setPosition({800.f, 150.f});
-        }
+        if (gameStarted && !gamePaused) {
+            // Update animation
+            if (animationClock.getElapsedTime() >= frameDuration)
+            {
+                currentFrame = (currentFrame + 1) % 5; // Cycle through frames
+                dinosaur.setTexture(yoshiFrames[currentFrame]);
+                animationClock.restart();
+            }
 
-        // Jumping logic
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && !isJumping) {
-            isJumping = true;
-        }
+            // Suelo
+            ground1.move({-groundSpeed, 0.f});
+            ground2.move({-groundSpeed, 0.f});
 
-        if (isJumping) {
-            dinosaur.setTexture(yoshiFrames[8]); // Show 'dino up' image while jumping
-            dinosaur.move({0.f, jumpSpeed});
-            jumpSpeed += gravity;
+            if (ground1.getPosition().x + groundWidth < 0)
+                ground1.setPosition({ground2.getPosition().x + groundWidth, ground1.getPosition().y});
 
-            if (dinosaur.getPosition().y >= originalY) {
-                dinosaur.setPosition({dinosaur.getPosition().x, originalY});
-                isJumping = false;
-                jumpSpeed = -10.0f; // Reset jump speed
+            if (ground2.getPosition().x + groundWidth < 0)
+                ground2.setPosition({ground1.getPosition().x + groundWidth, ground2.getPosition().y});
+
+            // Obstáculos
+            for (auto& obstacle : obstacles) {
+                obstacle.move({-obstacleSpeed, 0.f});
+                if (obstacle.getPosition().x < -100) {
+                    float randomDistance = 300.f + static_cast<float>(rand() % 200); // Distancia aleatoria entre 300 y 500
+                    obstacle.setPosition({800.f + randomDistance, 240.f}); // Move obstacles 5 pixels lower
+                }
+            }
+
+            // Enemy
+            enemy.move({-ghostSpeed, 0.f});
+            if (enemy.getPosition().x < -2000)
+            {
+                enemy.setPosition({800.f, 150.f});
+            }
+
+            // Jumping logic
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && !isJumping) {
+                isJumping = true;
+            }
+
+            if (isJumping) {
+                dinosaur.setTexture(yoshiFrames[8]); // Show 'dino up' image while jumping
+                dinosaur.move({0.f, jumpSpeed});
+                jumpSpeed += gravity;
+
+                if (dinosaur.getPosition().y >= originalY) {
+                    dinosaur.setPosition({dinosaur.getPosition().x, originalY});
+                    isJumping = false;
+                    jumpSpeed = -10.0f; // Reset jump speed
+                }
+            }
+
+            // Collision detection
+            for (const auto& obstacle : obstacles) {
+                sf::FloatRect dinosaurBox = dinosaur.getGlobalBounds();
+                sf::FloatRect obstacleBox = obstacle.getGlobalBounds();
+
+                if (dinosaurBox.findIntersection(obstacleBox)) {
+                    dinosaur.setTexture(yoshiFrames[7]); // Show collision texture
+                    gamePaused = true;
+                }
             }
         }
 
