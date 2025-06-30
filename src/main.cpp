@@ -175,6 +175,10 @@ int main()
                 sf::FloatRect dinosaurBox = dinosaur.getGlobalBounds();
                 sf::FloatRect obstacleBox = obstacle.getGlobalBounds();
 
+                // Reduce the size of the bounding boxes
+                dinosaurBox.size *= 0.8f; // Reduce width by 20%
+                obstacleBox.size *= 0.8f; // Reduce height by 20%
+
                 if (dinosaurBox.findIntersection(obstacleBox)) {
                     dinosaur.setTexture(yoshiFrames[7]); // Show collision texture
                     gamePaused = true;
