@@ -25,6 +25,12 @@ int main()
         }
     }
 
+    if (!yoshiFrames[6].loadFromFile("assets/image/dinosaur/dino down.png") ||
+        !yoshiFrames[7].loadFromFile("assets/image/dinosaur/dino loose.png") ||
+        !yoshiFrames[8].loadFromFile("assets/image/dinosaur/dino up.png")) {
+        return -1; // Exit if any texture fails to load
+    }
+
     // Create sprite and set initial texture
     sf::Sprite dinosaur(yoshiFrames[0]);
     dinosaur.scale({0.25f, 0.25f}); // Cambia el tamaño del dinosaurio
@@ -33,9 +39,9 @@ int main()
     // Obstáculo
     sf::Texture plant("assets/image/obstacle.png");
     sf::Sprite obstacle(plant);
-    obstacle.scale({0.10f, 0.10f});
-    obstacle.setPosition({650.f, 220.f});
-    float obstacleSpeed = 2.5f;
+    obstacle.scale({0.08f, 0.08f}); // Reduce obstacle size
+    obstacle.setPosition({650.f, 240.f}); // Move obstacle 5 pixels lower
+    float obstacleSpeed = 3.5f; // Increased obstacle speed
 
     // Suelo
     sf::Texture groundTexture("assets/image/ground.png");
@@ -50,7 +56,7 @@ int main()
     ground1.setPosition({0.f, 80.f});
     ground2.setPosition({groundWidth, 80.f});
 
-    float groundSpeed = 2.5f;
+    float groundSpeed = 3.5f; // Increased ground speed
 
     // Nube
     sf::Texture cloudTexture("assets/image/cloud.jpg");
@@ -71,11 +77,16 @@ int main()
     std::vector<sf::Sprite> obstacles;
     for (int i = 0; i < 3; ++i) { // Reduce el número de obstáculos a 3
         sf::Sprite obstacle(plant);
-        obstacle.scale({0.10f, 0.10f});
+        obstacle.scale({0.08f, 0.08f}); // Reduce obstacle size
         float randomDistance = 300.f + static_cast<float>(rand() % 200); // Distancia aleatoria entre 300 y 500
-        obstacle.setPosition({800.f + i * randomDistance, 220.f});
+        obstacle.setPosition({800.f + i * randomDistance, 240.f}); // Move obstacles 5 pixels lower
         obstacles.push_back(obstacle);
     }
+
+    bool isJumping = false;
+    float jumpSpeed = -10.0f; // Further reduced jump speed for lower jump
+    float gravity = 0.3f; // Increased gravity for faster fall
+    float originalY = dinosaur.getPosition().y;
 
     // Loop del juego
     while (window.isOpen())
@@ -111,7 +122,7 @@ int main()
             obstacle.move({-obstacleSpeed, 0.f});
             if (obstacle.getPosition().x < -100) {
                 float randomDistance = 300.f + static_cast<float>(rand() % 200); // Distancia aleatoria entre 300 y 500
-                obstacle.setPosition({800.f + randomDistance, 220.f});
+                obstacle.setPosition({800.f + randomDistance, 240.f}); // Move obstacles 5 pixels lower
             }
         }
 
@@ -120,6 +131,23 @@ int main()
         if (enemy.getPosition().x < -2000)
         {
             enemy.setPosition({800.f, 150.f});
+        }
+
+        // Jumping logic
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && !isJumping) {
+            isJumping = true;
+        }
+
+        if (isJumping) {
+            dinosaur.setTexture(yoshiFrames[8]); // Show 'dino up' image while jumping
+            dinosaur.move({0.f, jumpSpeed});
+            jumpSpeed += gravity;
+
+            if (dinosaur.getPosition().y >= originalY) {
+                dinosaur.setPosition({dinosaur.getPosition().x, originalY});
+                isJumping = false;
+                jumpSpeed = -10.0f; // Reset jump speed
+            }
         }
 
         // Clear screen
