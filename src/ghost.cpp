@@ -1,17 +1,27 @@
-#include "ghost.hpp"
-#include <SFML/Graphics.hpp>
-#include <iostream>
+// Ghost.cpp
+#include "Ghost.hpp"
+#include <iostream> // For error reporting
 
-Ghost::Ghost() : ghost("assets/image/ghost.png"), enemy(ghost) 
+Ghost::Ghost(const std::string& texturePath, float initialX, float initialY, float speed)
+    : m_speed(speed)
 {
-    if (ghost.loadFromFile("assets/image/ghost.png")) {
-        enemy.setTexture(ghost);
+    if (!m_texture.loadFromFile(texturePath)) {
+        std::cerr << "Error: Failed to load Ghost texture from " << texturePath << std::endl;
+        // Handle error
     }
-    
-    enemy.scale({0.10f, 0.10f});
-    enemy.setPosition({-1200.f, 150.f});
+    m_sprite.setTexture(m_texture);
+    m_sprite.scale({0.10f, 0.10f});
+    m_sprite.setPosition({initialX, initialY});
 }
 
-void Ghost::draw(sf::RenderWindow& window) {
+void Ghost::move() {
+    m_sprite.move({-m_speed, 0.f});
+}
 
+void Ghost::resetPosition(float windowWidth) {
+    m_sprite.setPosition({windowWidth, m_sprite.getPosition().y});
+}
+
+void Ghost::draw(sf::RenderWindow& window) const {
+    window.draw(m_sprite);
 }

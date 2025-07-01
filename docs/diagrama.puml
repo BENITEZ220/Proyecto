@@ -10,10 +10,16 @@ class Dinosaurio {
     + agacharse(): void
 }
 
-class Escenario {
-    - texturaSuelo: Texture
-    - texturaCielo: Texture
-    + moverSuelo(): void
+
+class Suelo{
+    - textura: Texture
+    - velocidad: float
+    + mover(): void
+}
+
+class Cielo{
+    - textura: Texture
+    - velocidad: float
     + moverCielo(): void
 }
 
@@ -42,7 +48,9 @@ class Sonido {
 
 Dinosaurio "1" o-- "*" Obstaculo
 Dinosaurio "1" o-- "1" Enemigo
-Dinosaurio "1" *-- "1" Escenario
+Dinosaurio "1" *-- "1" Cielo
+Dinosaurio "1" *-- "1" Suelo
 Dinosaurio "1" o-- "3" Sonido
+
 
 @enduml
