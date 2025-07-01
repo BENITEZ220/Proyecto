@@ -3,9 +3,13 @@
 #include <optional>
 #include <vector>
 #include <string>
+#include <cloud.hpp>
+#include <ghost.hpp>
 
 int main()
 {
+    Cloud Cloud;
+
     // Animation variables
     size_t currentFrame = 0;
     sf::Clock animationClock;
@@ -58,15 +62,9 @@ int main()
 
     float groundSpeed = 3.5f; // Increased ground speed
 
-    // Nube
-    sf::Texture cloudTexture("assets/image/cloud.jpg");
-    sf::Sprite sky(cloudTexture);
-    sky.scale({1.5f, 1.f});
-    sky.setPosition({0.f, 0.f});
 
-    float cloudSpeed = 1.5f;
 
-    // Fantasma
+    // Enemy
     sf::Texture ghostTexture("assets/image/ghost.png");
     sf::Sprite enemy(ghostTexture);
     enemy.scale({0.10f, 0.10f});
@@ -146,7 +144,7 @@ int main()
                 }
             }
 
-            // Enemy
+            
             enemy.move({-ghostSpeed, 0.f});
             if (enemy.getPosition().x < -2000)
             {
@@ -170,6 +168,17 @@ int main()
                 }
             }
 
+            // Crouching logic
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) && !isJumping) {
+                dinosaur.setTexture(yoshiFrames[6]); // Show 'dino down' image
+                dinosaur.setScale({0.25f, 0.25f}); // Adjust scale for crouching
+                dinosaur.setPosition({20.f , 230.f }); // Lower position slightly
+            } else if (!isJumping) {
+                dinosaur.setTexture(yoshiFrames[currentFrame]); // Reset to running animation
+                dinosaur.setScale({0.25f, 0.25f}); // Reset scale
+                dinosaur.setPosition({dinosaur.getPosition().x, originalY}); // Reset position
+            }
+
             // Collision detection
             for (const auto& obstacle : obstacles) {
                 sf::FloatRect dinosaurBox = dinosaur.getGlobalBounds();
@@ -190,7 +199,7 @@ int main()
         window.clear(sf::Color(135, 206, 235));
 
         // Draw the sprite
-        window.draw(sky);
+        Cloud.draw(window);
         window.draw(enemy);
         window.draw(ground1);
         window.draw(ground2);

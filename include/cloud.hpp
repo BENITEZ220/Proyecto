@@ -5,9 +5,10 @@
 class Cloud {
 private:
     sf::Texture cloud;
-    sf::Sprite sky;
+    
 public:
     Cloud();
     void draw(sf::RenderWindow& window);
+    sf::Sprite sky;
 };
 #endif // CLOUD_HPP
