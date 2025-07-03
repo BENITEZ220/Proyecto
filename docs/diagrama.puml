@@ -8,19 +8,21 @@ class Dinosaurio {
     - gravedad: float
     + saltar(): void
     + agacharse(): void
+    + actualizar(): void
 }
 
-
-class Suelo{
+class Suelo {
     - textura: Texture
     - velocidad: float
     + mover(): void
+    + actualizar(): void
 }
 
-class Cielo{
+class Cielo {
     - textura: Texture
     - velocidad: float
     + moverCielo(): void
+    + actualizar(): void
 }
 
 class Obstaculo {
@@ -28,6 +30,7 @@ class Obstaculo {
     - textura: Texture
     - velocidad: float
     + mover(): void
+    + actualizar(): void
 }
 
 class Enemigo {
@@ -35,6 +38,7 @@ class Enemigo {
     - textura: Texture
     - velocidad: float
     + mover(): void
+    + actualizar(): void
 }
 
 class Sonido {
@@ -45,6 +49,7 @@ class Sonido {
     + reproducirEfectoSalto(): void
     + reproducirEfectoMuerte(): void
 }
+
 
 Dinosaurio "1" o-- "*" Obstaculo
 Dinosaurio "1" o-- "1" Enemigo
