@@ -118,6 +118,18 @@ int main()
  
     
 
+    // Fuente y texto para el contador de metros
+    sf::Font font("assets/fonts/font.ttf");
+    sf::Text metrosText(font);
+    
+    metrosText.setString("Score: 0");
+    metrosText.setCharacterSize(25);
+    metrosText.setFillColor(sf::Color::White);
+    metrosText.setStyle(sf::Text::Bold | sf::Text::Underlined);
+    metrosText.setPosition({50.f, 10.f});
+    int metros = 0;
+    int scoreTick = 0; // Para controlar la velocidad del score
+
     // Loop del juego
     while (window.isOpen())
     {
@@ -153,6 +165,8 @@ int main()
                     obstacle.setPosition({800.f + randomDistance, 240.f});
                 }
                 enemy.setPosition({-1200.f, 150.f}); // Reset enemy position
+                metros = 0; // Reinicia el score al reiniciar el juego
+                metrosText.setString("Score: 0");
             }
         }
 
@@ -235,6 +249,14 @@ int main()
                     gameover.play(); // Play game over sound
                 }
             }
+
+            // Score 
+            scoreTick++;
+            if (scoreTick >= 6) { // Ajusta este valor para controlar la velocidad del score
+                metros++;
+                metrosText.setString("Score: " + std::to_string(metros));
+                scoreTick = 0;
+            }
         }
 
         // Clear screen
@@ -249,6 +271,7 @@ int main()
             window.draw(obstacle);
         }
         window.draw(dinosaur);
+        window.draw(metrosText); // Dibuja el contador de metros
 
         // Update the window
         window.display();
