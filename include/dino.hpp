@@ -1,60 +1,115 @@
-// Dino.hpp
-#ifndef DINO_HPP
-#define DINO_HPP
-
+#pragma once
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <vector>
 #include <string>
 
 class Dino {
-public:
-    // Constructor
-    Dino(const std::string& texturePathPrefix);
-
-    // Updates the animation
-    void updateAnimation();
-
-    
-    void jump();
-
-    // Updates the dinosaur's position during a jump, applying gravity
-    void updateJump();
-
-    // Resets the dinosaur's position and state for a new game
-    void reset();
-
-    // Sets the texture to indicate a collision
-    void setCollisionTexture();
-
-    // Gets the global bounding box of the dinosaur for collision detection
-    sf::FloatRect getGlobalBounds() const;
-
-    // Draws the dinosaur sprite to the render window
-    void draw(sf::RenderWindow& window) const;
-
-    // Gets the current position of the dinosaur
-    sf::Vector2f getPosition() const;
-
-    // Sets the position of the dinosaur
-    void setPosition(const sf::Vector2f& pos);
-
-    // Checks if the dinosaur is currently jumping
-    bool isJumpingState() const;
-
 private:
-    sf::Sprite m_sprite;                    
-    std::vector<sf::Texture> textures;    
-    sf::Clock animationClock;             
-    const sf::Time frameDuration;         
+    std::vector<sf::Texture> yoshiFrames;
+    sf::Sprite sprite;
+    sf::SoundBuffer jumpBuffer;
+    sf::Sound jumpSound;
+    sf::SoundBuffer loseBuffer;
+    sf::Sound gameover;
+    size_t currentFrame = 0;
+    sf::Clock animationClock;
+    const sf::Time frameDuration = sf::milliseconds(100);
+    bool isJumping = false;
+    float jumpSpeed = -10.0f;
+    float gravity = 0.3f;
+    float originalY = 200.f;
 
-    size_t currentFrame;                  
-    bool isJumping;                       
-    float jumpSpeed;                      
-    float gravity;                        
-    float originalY;                      
+public:
+    Dino() {
+        yoshiFrames.resize(9);
+        for (int i = 0; i < 6; ++i) {
+            if (!yoshiFrames[i].loadFromFile("assets/image/dinosaur/dino " + std::to_string(i + 1) + ".png")) {
+                throw std::runtime_error("Failed to load dino texture " + std::to_string(i + 1));
+            }
+        }
+        if (!yoshiFrames[6].loadFromFile("assets/image/dinosaur/dino down.png") ||
+            !yoshiFrames[7].loadFromFile("assets/image/dinosaur/dino loose.png") ||
+            !yoshiFrames[8].loadFromFile("assets/image/dinosaur/dino up.png")) {
+            throw std::runtime_error("Failed to load dino texture");
+        }
+        sprite.setTexture(yoshiFrames[0]);
+        sprite.scale({0.25f, 0.25f});
+        sprite.setPosition({20.f, 200.f});
+        if (!jumpBuffer.loadFromFile("assets/audio/jump.mp3")) {
+            throw std::runtime_error("Failed to load jump sound");
+        }
+        jumpSound.setBuffer(jumpBuffer);
+        if (!loseBuffer.loadFromFile("assets/audio/gameover.mp3")) {
+            throw std::runtime_error("Failed to load gameover sound");
+        }
+        gameover.setBuffer(loseBuffer);
+        gameover.setVolume(700.f);
+    }
 
-    // Loads all textures for the dinosaur
-    bool loadTextures(const std::string& texturePathPrefix);
+    void update(bool gameStarted, bool gamePaused) {
+        if (!gameStarted || gamePaused) return;
+
+        // Animation
+        if (animationClock.getElapsedTime() >= frameDuration) {
+            currentFrame = (currentFrame + 1) % 5;
+            sprite.setTexture(yoshiFrames[currentFrame]);
+            animationClock.restart();
+        }
+
+        // Jumping logic
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && !isJumping) {
+            isJumping = true;
+            jumpSound.play();
+        }
+        if (isJumping) {
+            sprite.setTexture(yoshiFrames[8]);
+            sprite.move({0.f, jumpSpeed});
+            jumpSpeed += gravity;
+            if (sprite.getPosition().y >= originalY) {
+                sprite.setPosition({sprite.getPosition().x, originalY});
+                isJumping = false;
+                jumpSpeed = -10.0f;
+            }
+        }
+
+        // Crouching logic
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) && !isJumping) {
+            sprite.setTexture(yoshiFrames[6]);
+            sprite.setScale({0.25f, 0.25f});
+            sprite.setPosition({20.f, 230.f});
+        } else if (!isJumping) {
+            sprite.setTexture(yoshiFrames[currentFrame]);
+            sprite.setScale({0.25f, 0.25f});
+            sprite.setPosition({sprite.getPosition().x, originalY});
+        }
+    }
+
+    void draw(sf::RenderWindow& window) {
+        window.draw(sprite);
+    }
+
+    bool checkCollision(const sf::Sprite& obstacle) {
+        sf::FloatRect dinosaurBox = sprite.getGlobalBounds();
+        sf::FloatRect obstacleBox = obstacle.getGlobalBounds();
+        dinosaurBox.size *= 0.8f;
+        obstacleBox.size *= 0.8f;
+        if (dinosaurBox.findIntersection(obstacleBox)) {
+            sprite.setTexture(yoshiFrames[7]);
+            gameover.play();
+            return true;
+        }
+        return false;
+    }
+
+    void reset() {
+        sprite.setTexture(yoshiFrames[0]);
+        sprite.setPosition({20.f, 200.f});
+        isJumping = false;
+        jumpSpeed = -10.0f;
+        currentFrame = 0;
+        animationClock.restart();
+    }
+
+    sf::Sprite& getSprite() { return sprite; }
 };
-
-#endif // DINO_HPP

@@ -1,29 +1,38 @@
-// Ghost.hpp
-#ifndef GHOST_HPP
-#define GHOST_HPP
-
+#pragma once
 #include <SFML/Graphics.hpp>
-#include <string>
 
 class Ghost {
-public:
-    // Constructor: loads texture and initializes the ghost sprite
-    Ghost(const std::string& texturePath, float initialX, float initialY, float speed);
-
-    // Moves the ghost horizontally based on its speed
-    void move();
-
-    // Resets the ghost's position to the right of the screen
-    void resetPosition(float windowWidth);
-
-    // Draws the ghost sprite to the render window
-    void draw(sf::RenderWindow& window) const;
-
 private:
-    sf::Sprite m_sprite;    // The sprite representing the ghost
-    sf::Texture m_texture;  // The texture for the ghost
-    float m_speed;          // Horizontal speed of the ghost
-};
+    sf::Texture ghostTexture;
+    sf::Sprite enemy;
+    float ghostSpeed = 4.5f;
 
-#endif // GHOST_HPP
+public:
+    Ghost() {
+        if (!ghostTexture.loadFromFile("assets/image/ghost.png")) {
+            throw std::runtime_error("Failed to load ghost texture");
+        }
+        enemy.setTexture(ghostTexture);
+        enemy.scale({0.10f, 0.10f});
+        enemy.setPosition({-1200.f, 150.f});
+    }
+
+    void update(bool gameStarted, bool gamePaused) {
+        if (!gameStarted || gamePaused) return;
+        enemy.move({-ghostSpeed, 0.f});
+        if (enemy.getPosition().x < -2000) {
+            enemy.setPosition({800.f, 150.f});
+        }
+    }
+
+    void draw(sf::RenderWindow& window) {
+        window.draw(enemy);
+    }
+
+    void reset() {
+        enemy.setPosition({-1200.f, 150.f});
+    }
+
+    sf::Sprite& getSprite() { return enemy; }
+};
 

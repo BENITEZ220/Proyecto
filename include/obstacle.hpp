@@ -1,34 +1,50 @@
-// Obstacle.hpp
-#ifndef OBSTACLE_HPP
-#define OBSTACLE_HPP
-
+#pragma once
 #include <SFML/Graphics.hpp>
-#include <string>
+#include <vector>
 
 class Obstacle {
-public:
-    // Constructor: loads texture and initializes the obstacle sprite
-    Obstacle(const std::string& texturePath, float initialX, float initialY, float speed);
-
-    // Moves the obstacle horizontally based on its speed
-    void move();
-
-    // Resets the obstacle's position to the right of the screen
-    void resetPosition(float windowWidth);
-
-    // Gets the global bounding box of the obstacle for collision detection
-    sf::FloatRect getGlobalBounds() const;
-
-    // Draws the obstacle sprite to the render window
-    void draw(sf::RenderWindow& window) const;
-
-    // Gets the current X position of the obstacle
-    float getPositionX() const;
-
 private:
-    sf::Sprite m_sprite;    // The sprite representing the obstacle
-    sf::Texture m_texture;  // The texture for the obstacle
-    float m_speed;          // Horizontal speed of the obstacle
-};
+    sf::Texture plantTexture;
+    std::vector<sf::Sprite> obstacles;
+    float obstacleSpeed = 6.0f;
 
-#endif // OBSTACLE_HPP
+public:
+    Obstacle() {
+        if (!plantTexture.loadFromFile("assets/image/obstacle.png")) {
+            throw std::runtime_error("Failed to load obstacle texture");
+        }
+        for (int i = 0; i < 3; ++i) {
+            sf::Sprite obstacle(plantTexture);
+            obstacle.scale({0.08f, 0.08f});
+            float randomDistance = 300.f + static_cast<float>(rand() % 200);
+            obstacle.setPosition({800.f + i * randomDistance, 240.f});
+            obstacles.push_back(obstacle);
+        }
+    }
+
+    void update(bool gameStarted, bool gamePaused) {
+        if (!gameStarted || gamePaused) return;
+        for (auto& obstacle : obstacles) {
+            obstacle.move({-obstacleSpeed, 0.f});
+            if (obstacle.getPosition().x < -100) {
+                float randomDistance = 300.f + static_cast<float>(rand() % 200);
+                obstacle.setPosition({800.f + randomDistance, 240.f});
+            }
+        }
+    }
+
+    void draw(sf::RenderWindow& window) {
+        for (const auto& obstacle : obstacles) {
+            window.draw(obstacle);
+        }
+    }
+
+    void reset() {
+        for (int i = 0; i < obstacles.size(); ++i) {
+            float randomDistance = 300.f + static_cast<float>(rand() % 200);
+            obstacles[i].setPosition({800.f + i * randomDistance, 240.f});
+        }
+    }
+
+    const std::vector<sf::Sprite>& getObstacles() const { return obstacles; }
+};
