@@ -1,6 +1,6 @@
 # 🦖 Dino Runner · C++ + SFML 3.0.1
 
-![Personaje]\(assets/image/dinosaur/dino loose.png)
+![Personaje](assets/image/dinosaur/dino loose.png)
 
 Este proyecto es un videojuego tipo *endless runner* desarrollado en C++ utilizando la biblioteca [SFML 3.0.1](https://www.sfml-dev.org/). El jugador controla un dinosaurio que debe esquivar obstáculos mientras corre sin fin, intentando lograr la máxima puntuación posible. Es una versión inspirada en el famoso "Dino" de Google Chrome, con gráficos, sonidos y animaciones personalizadas.
 
