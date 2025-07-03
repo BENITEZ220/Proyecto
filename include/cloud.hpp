@@ -9,6 +9,7 @@ private:
 
 public:
     Cloud() {
+        
         if (!cloudTexture.loadFromFile("assets/image/cloud.jpg")) {
             throw std::runtime_error("Failed to load cloud texture");
         }
@@ -19,7 +20,6 @@ public:
 
     void update(bool gameStarted, bool gamePaused) {
         if (!gameStarted || gamePaused) return;
-        // No movement for sky/cloud as in original code
     }
 
     void draw(sf::RenderWindow& window) {
