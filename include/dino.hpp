@@ -8,13 +8,13 @@
 
 class Dino {
 public:
-    // Constructor: loads textures and initializes the dinosaur sprite
+    // Constructor
     Dino(const std::string& texturePathPrefix);
 
-    // Updates the animation frame of the dinosaur
+    // Updates the animation
     void updateAnimation();
 
-    // Initiates a jump for the dinosaur
+    
     void jump();
 
     // Updates the dinosaur's position during a jump, applying gravity
@@ -42,18 +42,18 @@ public:
     bool isJumpingState() const;
 
 private:
-    sf::Sprite m_sprite;                    // The sprite representing the dinosaur
-    std::vector<sf::Texture> m_textures;    // Vector to hold animation frames
-    sf::Clock m_animationClock;             // Clock to manage animation frame timing
-    const sf::Time m_frameDuration;         // Duration for each animation frame
+    sf::Sprite m_sprite;                    
+    std::vector<sf::Texture> textures;    
+    sf::Clock animationClock;             
+    const sf::Time frameDuration;         
 
-    size_t m_currentFrame;                  // Current frame index for animation
-    bool m_isJumping;                       // Flag to indicate if the dinosaur is jumping
-    float m_jumpSpeed;                      // Current vertical speed during jump
-    float m_gravity;                        // Gravity applied during jump
-    float m_originalY;                      // Original Y position of the dinosaur (ground level)
+    size_t currentFrame;                  
+    bool isJumping;                       
+    float jumpSpeed;                      
+    float gravity;                        
+    float originalY;                      
 
-    // Loads all necessary textures for the dinosaur
+    // Loads all textures for the dinosaur
     bool loadTextures(const std::string& texturePathPrefix);
 };
 
